@@ -5,25 +5,27 @@ import { useUser } from '@clerk/clerk-react';
 import CreationItem from '../components/CreationItem';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
+
 const Dashboard = () => {
   const [creations, setCreations] = useState([]);
-  const [loading,setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const { user, isLoaded } = useUser();
-  const {getToken} = useAuth();
+  const { getToken } = useAuth();
+
   const getDashboardData = async () => {
     try {
-      const {data} = await axios.get('/api/user/get-user-creations',{
-        headers:{Authorization:`Bearer ${await getToken()}`}
-      })
-      if(data.success){
+      const { data } = await axios.get('/api/user/get-user-creations', {
+        headers: { Authorization: `Bearer ${await getToken()}` }
+      });
+      if (data.success) {
         setCreations(data.creations);
-      }
-      else{
+      } else {
         toast.error(data.message);
       }
     } catch (error) {
-       toast.error(error.message);
+      toast.error(error.message);
     }
     setLoading(false);
   };
@@ -59,22 +61,25 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      {
-        loading ? (
-          <div className='flex justify-center items-center h-3/4'>
-            <div className='animate-spin rounded-full h-11 w-11 border-3
-            border-purple-500 border-t-transparent'></div>
-          </div>
-        ): (
-          <div className='space-y-3'>
+
+      {/* Loader */}
+      {loading ? (
+        <div className='flex justify-center items-center h-3/4'>
+          <div className='animate-spin rounded-full h-11 w-11 border-3 border-purple-500 border-t-transparent'></div>
+        </div>
+      ) : (
+        <div className='space-y-3'>
           <p className='mt-6 mb-4'>Recent Creations</p>
-          {
-            creations.map((item)=><CreationItem key={item.id} item={item}/>)
-          }
-      </div>
-        )
-      }
-      
+          {creations.length === 0 ? (
+            <div className='text-center mt-10 text-slate-500'>
+              <p>No creations yet.</p>
+              <p className='text-sm'>Start creating something awesome!</p>
+            </div>
+          ) : (
+            creations.map((item) => <CreationItem key={item.id} item={item} />)
+          )}
+        </div>
+      )}
     </div>
   );
 };
