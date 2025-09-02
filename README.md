@@ -30,7 +30,7 @@
 ## 🚀 Deployment
 
 The project is deployed and live on **Vercel**.  
-🔗 [Live Demo](https://quick-ai-client-nine.vercel.app/)
+🔗 [Live Demo](https://genie-ai-client.vercel.app/)
 
 ---
 
