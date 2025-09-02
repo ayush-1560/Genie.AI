@@ -93,26 +93,69 @@ export const generateImage = async (req,res)=>{
         const {userId} = req.auth();
         const {prompt,publish} = req.body;
         const plan = req.plan;
-        if(plan!='premium'){
+
+        console.log("🖼️ Generate Image called");
+        console.log("User:", userId);
+        console.log("Prompt:", prompt);
+        console.log("Plan:", plan);
+
+        if(plan!=='premium'){
             return res.json({success:false,message:"This feature is only available for premium subscriptions"});
         }
+
+        // Debug before API call
+        console.log("➡️ Sending request to ClipDrop API...");
+
         const formData = new FormData();
         formData.append('prompt', prompt);
-        const {data}=await axios.post("https://clipdrop-api.co/text-to-image/v1",formData,{
-            headers:{'x-api-key':process.env.CLIPDROP_API_KEY,},
-            responseType:"arraybuffer",
-        });
-        const base64Image= `data:image/png;base64,${Buffer.from(data,'binary')
-            .toString('base64')}`;
+
+        const {data} = await axios.post(
+            "https://clipdrop-api.co/text-to-image/v1",
+            formData,
+            {
+                headers:{
+                    'x-api-key':process.env.CLIPDROP_API_KEY,
+                    ...formData.getHeaders?.()   // important if using node FormData
+                },
+                responseType:"arraybuffer",
+            }
+        );
+
+        console.log("✅ ClipDrop response received. Size:", data?.byteLength);
+
+        const base64Image= `data:image/png;base64,${Buffer.from(data,'binary').toString('base64')}`;
+
+        console.log("➡️ Uploading to Cloudinary...");
+
         const {secure_url} = await cloudinary.uploader.upload(base64Image);
-        await sql `INSERT INTO creations(user_id,prompt,content,type,publish)
-        VALUES(${userId},${prompt},${secure_url},'image',${publish ?? false})`;
+
+        console.log("✅ Uploaded to Cloudinary:", secure_url);
+
+        await sql`
+          INSERT INTO creations(user_id,prompt,content,type,publish)
+          VALUES(${userId},${prompt},${secure_url},'image',${publish ?? false})
+        `;
+
+        console.log("✅ Saved in DB");
+
         res.json({success:true,content:secure_url});
-        } catch (error) {
-            console.log(error.message);
-            res.json({success:false,message: error.message});
+
+    } catch (error) {
+        console.error("❌ Error in generateImage");
+
+        if (error.response) {
+            console.error("Status:", error.response.status);
+            console.error("Data:", error.response.data?.toString());
+        } else if (error.request) {
+            console.error("No response from ClipDrop:", error.request);
+        } else {
+            console.error("Message:", error.message);
         }
+
+        res.json({success:false,message: error.message});
+    }
 }
+
 
 export const removeImageBackground = async (req,res)=>{
     try {

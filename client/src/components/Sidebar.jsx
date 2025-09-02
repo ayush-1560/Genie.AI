@@ -12,6 +12,7 @@ import {
   Users,
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
+import { Protect } from '@clerk/clerk-react';
 
 const navItems = [
   { to: '/ai', label: 'Dashboard', Icon: House },
@@ -78,7 +79,10 @@ const Sidebar = ({ Sidebar, setSidebar }) => {
           <div>
             <h1 className="text-sm font-medium">{user.fullName}</h1>
             <p className="text-xs text-gray-500">
-              {user.publicMetadata?.plan === 'premium' ? 'Premium' : 'Free'} Plan
+                <Protect plan='premium' fallback= "Free">
+                  Premium
+                </Protect>
+                {" "}Plan
             </p>
           </div>
         </div>

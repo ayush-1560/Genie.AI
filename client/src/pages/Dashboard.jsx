@@ -1,17 +1,16 @@
 import { Gem, Sparkles } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/clerk-react';
-import { useUser } from '@clerk/clerk-react';
 import CreationItem from '../components/CreationItem';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { Protect } from '@clerk/clerk-react';
 
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 
 const Dashboard = () => {
   const [creations, setCreations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user, isLoaded } = useUser();
   const { getToken } = useAuth();
 
   const getDashboardData = async () => {
@@ -53,7 +52,9 @@ const Dashboard = () => {
           <div className='text-slate-600'>
             <p className='text-sm'>Active Plan</p>
             <h2 className='text-xl font-semibold'>
-              {!isLoaded ? '' : user?.publicMetadata?.plan === 'premium' ? 'Premium' : 'Free'}
+              <Protect plan='premium' fallback="Free">
+               Premium
+             </Protect>
             </h2>
           </div>
           <div className='w-10 h-10 rounded-lg bg-gradient-to-br from-[#FF61C5] to-[#9E53EE] text-white flex justify-center items-center'>
