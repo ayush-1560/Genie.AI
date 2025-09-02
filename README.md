@@ -1,6 +1,6 @@
-# 🚀 QuickAI
+# 🚀 Genie.AI
 
-**QuickAI** is a powerful AI-powered SaaS application built with the PERN stack and Gemini API. It offers a range of intelligent tools that enhance productivity and creativity for users, including text and image generation, resume review, and more.
+**Genie.AI** is a powerful AI-powered SaaS application built with the PERN stack and Gemini API. It offers a range of intelligent tools that enhance productivity and creativity for users, including text and image generation, resume review, and more.
 
 ---
 
